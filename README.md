@@ -1,6 +1,6 @@
 # PlanIt
 
-_PlanIt_ is a group event management app for decision-making, scheduling, and tracking participation. The app helps users easily create, join, and RSVP to events, as well as sync event details with their calendars.
+_PlanIt_ is a group event management app for decision-making, scheduling, and tracking participation. The app helps users easily create, join, and RSVP to events, as well as sync event details with their calendars. It also facilitates group decision-making by allowing users to vote on options for events.
 
 ---
 
@@ -8,7 +8,7 @@ _PlanIt_ is a group event management app for decision-making, scheduling, and tr
 
 ### **Overview**
 
-The MVP version of _PlanIt_ is focused on allowing users to create and RSVP for events, view event details, and receive basic notifications. The app syncs events with the user's calendar and has a simple backend to manage user data and events.
+The MVP version of _PlanIt_ is focused on allowing users to create and RSVP for events, view event details, and receive basic notifications. The app syncs events with the user's calendar and has a simple backend to manage user data and events. Additionally, it includes a voting system for making decisions on event options.
 
 ### **Features for MVP**:
 1. **User Authentication & Profile Setup**
@@ -37,9 +37,15 @@ The MVP version of _PlanIt_ is focused on allowing users to create and RSVP for 
    - Sync event with the device's calendar (Google Calendar, iOS Calendar).
    - Option to add the event to the user’s calendar from the event detail screen.
 
-8. **Backend (API)**
+8. **Decision-Making Feature (Voting)**
+   - Event organizers can create a list of options for decision-making (e.g., restaurant choices, activities, event time).
+   - Group members can vote on the options presented.
+   - Display results in real-time (e.g., vote tally, "winning" option).
+   - Options can be presented as a poll or a selection menu (radio buttons, dropdown list).
+
+9. **Backend (API)**
    - Simple **.NET API** to manage user data, events, and RSVPs.
-   - Basic database setup to store event details, user info, and RSVP statuses.
+   - Basic database setup to store event details, user info, RSVP statuses, and voting data.
 
 ---
 
@@ -73,9 +79,11 @@ The full version of _PlanIt_ includes all features from the MVP and additional e
    - Waiting list feature (if an event reaches capacity, users can be placed on a waiting list).
 
 5. **Event Voting & Decision-Making**
-   - Voting for restaurant choices, activity types, or other event details (time, location).
-   - Real-time voting results (visual representation like a bar chart or pie chart).
-   - Quick feedback after voting (e.g., "You voted for X!" or "This option is winning").
+   - **Option to Create Decision-Making Polls**: Event organizers can create options (e.g., restaurant choices, activity types, or other event details) for group voting.
+   - Users vote on the options, and results are updated in real time.
+   - Visual representation of the voting results (e.g., bar charts or pie charts).
+   - Display the winning option dynamically (e.g., "Winner: Restaurant A").
+   - Ability to close the poll once a decision is made and lock the options.
 
 6. **Event Details Screen**
    - Rich event description with media (images, links).
