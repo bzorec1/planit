@@ -14,3 +14,7 @@
 .cxx
 local.properties
 /.idea
+/obj
+/bin
+planit.api/bin
+planit.api/obj

@@ -1,5 +1,4 @@
-﻿4
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "planit.api", "planit.api\planit.api.csproj", "{069EDE19-24E8-44D0-A066-DE8A4383E33B}"
 EndProject
 Global
