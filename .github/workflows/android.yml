@@ -21,7 +21,10 @@ jobs:
         cache: gradle
 
     - name: Grant execute permission for gradlew
-      run: chmod +x planit/android/gradlew
+      run: chmod +x android/gradlew
+
+    - name: Init with Gradle
+      run: ./android/gradlew init
 
     - name: Build with Gradle
-      run: cd planit/android && ./gradlew build
+      run: ./android/gradlew build
