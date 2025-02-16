@@ -24,7 +24,7 @@ jobs:
       run: chmod +x android/gradlew
 
     - name: Init with Gradle
-      run: ./android/gradlew init
+      run: ./android/gradlew init --warning-mode all
 
     - name: Build with Gradle
       run: ./android/gradlew build
