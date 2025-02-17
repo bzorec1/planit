@@ -1,0 +1,81 @@
+Raziskava o Schedulerju in Sinhronizaciji Koledarja za Aplikacijo PlanIt
+Pregled
+Aplikacija PlanIt je zasnovana za enostavno upravljanje skupinskih dogodkov, odločanje, ustvarjanje urnikov in sinhronizacijo dogodkov z uporabniškimi koledarji. Ta dokument pokriva dve ključni komponenti, ki sta odločilna za delovanje aplikacije: Integracija Schedulerja in Sinhronizacija Koledarja. Ti komponenti sta ključna za obveščanje uporabnikov o spremembah dogodkov, opomnikih in posodabljanju stanja dogodkov v realnem času.
+
+Rešitev je zasnovana za mobilno aplikacijo za Android, ki uporablja Kotlin za mobilni razvoj, medtem ko .NET backend upravlja s schedulerjem, nalogami v ozadju in interakcijo z bazami podatkov.
+
+1. Scheduler za naloge v ozadju
+Scheduler je odgovoren za obvladovanje nalog v ozadju, kot so pošiljanje obvestil, posodabljanje stanja dogodkov in sinhronizacija dogodkov z zunanjimi koledarji. Ta sistem zagotavlja, da so uporabniki obveščeni o prihajajočih dogodkih in spremembah, brez da bi morali sami posegati v aplikacijo.
+
+1.1. Upravljanje nalog v ozadju
+Za obvladovanje nalog v ozadju mora aplikacija omogočiti naslednje funkcionalnosti:
+
+Periodično preverjanje prihajajočih dogodkov (npr. opomniki 24 ur pred dogodkom, 1 ura pred dogodkom).
+Pošiljanje obvestil, ko se dogodek približuje ali ko pride do sprememb (spremembe v RSVP statusu, odpoved dogodka).
+Posodabljanje stanja dogodkov (npr. označevanje dogodka kot "zaključen" po predvidenem času).
+Sinhronizacija dogodkov z zunanjimi koledarji (Google, iOS).
+Za razvoj mobilnih aplikacij obstajajo različni pristopi za izvajanje nalog v ozadju in upravljanje s schedulerjem:
+
+1.1.1. Android AlarmManager
+Namen: Android AlarmManager omogoča načrtovanje nalog v ozadju, kot so pošiljanje obvestil ali sprožitev drugih dejanj v določenem času, tudi če aplikacija ni aktivna.
+Ko uporabiti: Za naloge, ki temeljijo na času (npr. opomniki 1 uro pred dogodkom).
+Omejitve: Manj fleksibilno za kompleksnejše naloge, saj je primarno namenjeno preprostim nalogam, sproženim ob določenem času.
+1.1.2. WorkManager (Priporočeno)
+Namen: WorkManager je robustno orodje iz Android Jetpack, ki omogoča načrtovanje nalog v ozadju, katerih izvajanje mora biti zagotovljeno, tudi če aplikacija ni odprta.
+Ko uporabiti: Za naloge, ki morajo biti zanesljive in lahko delujejo, tudi če aplikacija ni v ozadju ali po ponovnem zagonu telefona (npr. opomniki, sinhronizacija, posodabljanje stanja dogodkov).
+Prednosti: Podpira tako enkratne kot periodične naloge. Prav tako obravnava posebne primere, kot so aplikacija, ki je zaprta, ali ponovni zagon telefona.
+1.1.3. Firebase Cloud Messaging (FCM)
+Namen: FCM omogoča pošiljanje potisnih obvestil na Android naprave. Lahko sproži obvestila ali naloge v ozadju, ko se dogodek približuje ali ko pride do spremembe v podatkih o dogodku.
+Ko uporabiti: Za obvestila v realnem času o spremembah dogodkov, RSVP spremembah, opomnikih in posodobitvah statusov (npr. dogodek "zaključen").
+Prednosti: Učinkovito za pošiljanje sporočil ali podatkov na specifične naprave brez porabe prekomernih virov.
+1.1.4. Načrtovanje nalog na strežniku (prek .NET)
+Namen: .NET backend bo obvladoval bolj kompleksne naloge v ozadju, kot so sinhronizacija dogodkov med platformami (npr. Google Koledar, iOS Koledar) in obvladovanje periodičnih nalog za posodobitev stanja dogodkov.
+Orodja:
+Quartz.NET: Popularen .NET okvir za načrtovanje nalog na strežniku.
+Hangfire: Sistem za obdelavo nalog v ozadju za .NET, ki omogoča načrtovanje nalog (npr. pošiljanje opomnikov) in spremljanje izvajanja nalog.
+Ko uporabiti: Ko gre za naloge, ki se izvajajo na strežniku (npr. obdelava posodobitev med backendom) in morajo interagirati z bazami podatkov, API-ji ali zunanjimi storitvami.
+Prednosti: Osredotočeno obvladovanje nalog na strežniku, kar zagotavlja sinhronizacijo podatkov in pravilno pošiljanje obvestil.
+2. Sinhronizacija Koledarja
+Integracija sinhronizacije koledarja omogoča uporabnikom, da upravljajo in si ogledajo dogodke neposredno iz svojega telefonskega koledarja (npr. Google Koledar ali iOS Koledar). Aplikacija mora podpirati sinhronizacijo dogodkov tako z internim koledarjem aplikacije kot z zunanjimi koledarskimi sistemi.
+
+2.1. Protokoli in storitve za sinhronizacijo koledarja
+Za dosego brezskrbne sinhronizacije obstaja več protokolov in storitev, ki omogočajo sinhronizacijo dogodkov med aplikacijo PlanIt in zunanjimi koledarji.
+
+2.1.1. Google Calendar API
+Namen: Google Calendar API omogoča aplikaciji, da komunicira z Google Koledarjem, omogoča ustvarjanje, posodabljanje in brisanje dogodkov neposredno iz aplikacije.
+Kako deluje: Aplikacija se lahko avtorizira prek OAuth 2.0, kar omogoča aplikaciji dostop in spreminjanje uporabniških Google Koledarjev. Aplikacija lahko ustvari dogodke, spremeni podrobnosti, nastavi opomnike in sinhronizira posodobitve statusa.
+Ko uporabiti: Za uporabnike, ki uporabljajo Google Koledar in potrebujejo samodejno sinhronizacijo dogodkov med napravami in platformami.
+Omejitve: Zahteva obvladovanje avtorizacije, obvladovanje omejitev hitrosti in obravnavanje morebitnih podatkovnih konfliktov.
+2.1.2. iOS EventKit (za iOS integracijo)
+Namen: EventKit je Appleov okvir za dostop do iOS Koledarja in njegovo spreminjanje.
+Kako deluje: Aplikacija bo uporabila EventKit za ustvarjanje, spreminjanje in brisanje dogodkov na iOS napravah. Uporabniki morajo dati dovoljenje za dostop do njihovega koledarja.
+Ko uporabiti: Za uporabnike, ki uporabljajo iOS naprave, in potrebujejo samodejno sinhronizacijo dogodkov z iOS Koledarjem.
+Omejitve: Ta funkcionalnost bo na voljo samo na iOS napravah, zato bo potrebna alternativa za Android.
+2.1.3. iCalendar (.ics)
+Namen: Format iCalendar omogoča izvoz in deljenje dogodkov med platformami (Google Koledar, Outlook itd.). To je preprost format datotek, ki ga je mogoče enostavno integrirati z različnimi koledarskimi storitvami.
+Kako deluje: Aplikacija lahko ustvari .ics datoteke za vsak dogodek, ki jih lahko nato deli ali uvozi v uporabnikov koledar.
+Ko uporabiti: Ko potrebujemo preprosto rešitev za deljenje dogodkov med različnimi platformami. Idealno za pošiljanje vabil na dogodke ali izvoze, ki jih lahko odprejo vse koledarske storitve.
+Omejitve: iCalendar datoteke so statične, kar pomeni, da vsaka posodobitev (npr. sprememba časa dogodka) zahteva ustvarjanje in pošiljanje nove .ics datoteke.
+2.1.4. CalDAV Protokol
+Namen: CalDAV je protokol, ki omogoča sinhronizacijo podatkov o koledarju med strežnikom in koledarskimi odjemalci v realnem času.
+Kako deluje: Aplikacija bo komunicirala z CalDAV strežniki (npr. Google, iCloud) za ustvarjanje, spreminjanje in brisanje dogodkov neposredno iz aplikacije.
+Ko uporabiti: Če aplikacija potrebuje podporo za sinhronizacijo dogodkov v realnem času z različnimi storitvami koledarja, ki podpirajo CalDAV (npr. Google Koledar).
+Omejitve: CalDAV zahteva bolj kompleksno implementacijo na strežniku, morda bo potrebno upravljati z različnimi tipi koledarjev (Google, iCloud itd.).
+3. Sinhronizacija z Schedulerjem
+3.1. Delovni tok sinhronizacije
+Ključna integracija med schedulerjem in sinhronizacijo koledarja je zagotavljanje, da so vse posodobitve dogodkov (obvestila, spremembe statusa, opomniki) v realnem času odražene na vseh platformah.
+
+3.1.1. Ustvarjanje dogodkov in načrtovanje
+Ko uporabnik ustvari dogodek v aplikaciji, backend (prek .NET in Kotlin) obvladuje ustvarjanje dogodka tako v internem koledarju aplikacije kot v uporabniškem zunanjem koledarju (prek Google Calendar API ali iOS EventKit). Scheduler nato načrtuje naloge v ozadju za opomnike, posodobitve statusa in naloge za sinhronizacijo.
+
+3.1.2. Posodobitve statusa dogodkov in obvestila
+Ko se dogodek približuje ali spremeni status (npr. dogodek "zaključen"), scheduler (prek WorkManager v Androidu) obvladuje čas pošiljanja obvestil. Na primer, ko se dogodek zaključi, aplikacija pošlje obvestilo, posodobi status dogodka in sinhronizira te informacije nazaj v uporabnikov koledar.
+
+3.1.3. Sinhronizacija med platformami
+Backend scheduler bo zagotovil, da so vsi podatki o dogodkih usklajeni med aplikacijo in zunanjimi koledarji. Vsaka sprememba (npr. premik dogodka) bo samodejno posodobljena na vseh platformah. Prav tako bodo sinhronizirane spremembe RSVP ali odpovedi dogodkov.
+
+4. Zaključek
+Ta raziskava opisuje potrebna orodja, protokole in metode za implementacijo integracije schedulerja in sinhronizacije koledarja za aplikacijo PlanIt. Z uporabo Android orodij, kot je WorkManager, skupaj z zunanjimi API-ji za koledarje (Google Koledar, iOS EventKit, CalDAV) bomo omogočili realnočasovno sinhronizacijo dogodkov in učinkovito obvladovanje nalog v ozadju. .NET backend bo odgovoren za upravljanje bolj kompleksnih nalog, kot so interakcije z API-ji, načrtovanje nalog v ozadju in vzdrževanje doslednosti podatkov med platformami.
+
+Z uporabo teh pristopov bo aplikacija PlanIt zagotavljala celovito in učinkovito rešitev za upravljanje dogodkov, obveščanje in sinhronizacijo koledarjev ter zagotavljanje gladkega uporabniškega izkustva na Android in iOS napravah.
+
