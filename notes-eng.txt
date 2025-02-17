@@ -1,0 +1,80 @@
+Research on Scheduler and Calendar Synchronization for PlanIt App
+Overview
+The PlanIt app aims to provide a seamless group event management experience, focusing on scheduling, decision-making, and syncing events with users' calendars. This document covers the two main components critical to the functionality of PlanIt: Scheduler Integration and Calendar Synchronization. These components will be key to notifying users of event changes, reminders, and updating event statuses in real-time.
+
+The solution is designed for an Android mobile app, leveraging Kotlin for mobile development, and a .NET backend to handle scheduling, background tasks, and database interactions.
+
+1. Scheduler for Background Tasks
+The scheduler is responsible for managing background tasks such as sending notifications, updating event statuses, and syncing events with external calendars. This system ensures that users are informed about upcoming events and changes without requiring manual intervention.
+
+1.1. Background Task Management
+To handle background tasks, the app needs a system that can:
+
+Periodically check for upcoming events (e.g., reminders 24 hours before, 1 hour before).
+Trigger notifications when events are approaching or when there are updates (RSVP changes, event cancellations).
+Update event statuses (e.g., marking events as "ended" after the scheduled time).
+Sync event data with users' external calendars (Google, iOS).
+For mobile app development, there are several approaches to implement background tasks and scheduling:
+
+1.1.1. Android AlarmManager
+Purpose: The Android AlarmManager can schedule background tasks like sending notifications or triggering other actions at specific times, even if the app is not running.
+When to Use: For tasks that are time-based (e.g., reminders 1 hour before an event).
+Limitations: Can be less flexible for complex or long-running tasks, as it’s mostly used for simple, time-triggered events.
+1.1.2. WorkManager (Recommended)
+Purpose: WorkManager is a robust and flexible tool from Android Jetpack, designed for scheduling background tasks that need to be guaranteed to run, even if the app is not open.
+When to Use: For tasks that need to be reliable and can run even if the app is in the background or after the phone is restarted (e.g., reminders, syncing, updating event statuses).
+Advantages: Supports both one-time and periodic tasks. It also handles edge cases like app being killed or phone rebooting.
+1.1.3. Firebase Cloud Messaging (FCM)
+Purpose: FCM is used for sending push notifications to Android devices. It can trigger notifications or background tasks when events are approaching or when event details change.
+When to Use: For real-time notifications about event updates, RSVPs, reminders, and status changes (e.g., event "ended").
+Advantages: Efficient for sending messages or data to specific devices without using excessive resources.
+1.1.4. Backend Task Scheduling (via .NET)
+Purpose: The .NET backend will manage more complex background tasks, such as syncing events across platforms (e.g., Google Calendar, iOS Calendar) and handling periodic checks for event status updates.
+Tools:
+Quartz.NET: A popular .NET framework for scheduling tasks in the backend.
+Hangfire: A background task processing system for .NET that allows for scheduling jobs (such as sending reminders) and monitoring job execution.
+When to Use: When the task is server-side (e.g., processing updates across the backend), and needs to interact with databases, APIs, or external services.
+Advantages: Centralized task management, which can ensure that event data is synchronized and notifications are sent correctly.
+2. Calendar Synchronization
+The integration of calendar synchronization allows PlanIt users to manage and view events directly from their phone’s calendar (e.g., Google Calendar or iOS Calendar). The app needs to support syncing events with both external calendars and the app’s internal calendar system.
+
+2.1. Calendar Protocols and Services
+To achieve seamless synchronization, several protocols and services can be used for syncing events between the PlanIt app and external calendars.
+
+2.1.1. Google Calendar API
+Purpose: The Google Calendar API allows the app to interact with Google Calendar, enabling the creation, updating, and deletion of events directly from the app.
+How It Works: The app can authenticate users through OAuth 2.0, allowing the app to access and modify users' Google Calendars. The app can create events, modify details, set reminders, and synchronize status updates.
+When to Use: For users who primarily use Google Calendar, and need automatic syncing of events across devices and platforms.
+Limitations: Requires handling authentication, managing rate limits, and dealing with potential data conflicts.
+2.1.2. iOS EventKit (for iOS integration)
+Purpose: EventKit is Apple's framework for accessing and modifying the iOS Calendar.
+How It Works: The app will use EventKit to create, modify, and delete events on iOS devices. Users will need to grant permissions to the app to access their calendar.
+When to Use: For users with iOS devices, enabling automatic syncing of events in the iOS Calendar.
+Limitations: This feature would be used only on iOS devices, so an alternative solution would be needed for Android.
+2.1.3. iCalendar (.ics)
+Purpose: The iCalendar format allows events to be exported and shared across platforms (Google Calendar, Outlook, etc.). It's a simple file format that can be easily integrated with various calendar services.
+How It Works: The app can generate .ics files for each event, which can then be shared or imported into users' calendars.
+When to Use: When a simple solution is needed for cross-platform sharing of events. It’s ideal for event invitations or exports that can be opened in any calendar service.
+Limitations: iCalendar files are static, meaning any updates (like changing an event's time) require generating and sending a new .ics file.
+2.1.4. CalDAV Protocol
+Purpose: CalDAV is a protocol that allows calendar data to be synced between a server and a calendar client in real time.
+How It Works: The app will interact with CalDAV servers (such as those used by Google or iCloud) to create, update, and delete events directly from the app.
+When to Use: If the app needs to support real-time syncing of events with calendar services that support CalDAV (e.g., Google Calendar).
+Limitations: CalDAV requires more complex server-side implementation, and may need to manage multiple calendar types (Google, iCloud, etc.).
+3. Synchronization with Scheduler
+3.1. Synchronization Workflow
+The key integration between the scheduler and calendar synchronization systems is ensuring that all event updates (notifications, status changes, and reminders) are reflected in real-time across platforms.
+
+3.1.1. Event Creation & Scheduling
+When a user creates an event in the app, the backend (using .NET and Kotlin) will handle the creation of the event on both the app’s internal calendar and the user’s external calendar (via Google Calendar API or iOS EventKit). The scheduler will then schedule background tasks for reminders, status updates, and sync tasks.
+
+3.1.2. Event Status Updates & Notifications
+As the event approaches or changes status (e.g., event “ended”), the scheduler (via WorkManager in Android) will handle the timing of notifications. For example, when the event is about to end, the app sends a notification, updates the event status, and syncs this information back to the user's calendar.
+
+3.1.3. Cross-Platform Syncing
+The backend scheduler will ensure that all event data is consistent between the app and the external calendars. Any changes made (e.g., rescheduling an event) will be updated automatically in both places. Similarly, any RSVP changes or event cancellations will be synchronized across all platforms.
+
+4. Conclusion
+This research outlines the necessary tools, protocols, and methods for implementing scheduler integration and calendar synchronization for the PlanIt app. By using Android-native tools like WorkManager, combined with external calendar APIs (Google Calendar, iOS EventKit, CalDAV), we can ensure real-time synchronization of events and effective task scheduling. The .NET backend will be responsible for managing more complex tasks such as handling API integrations, scheduling background tasks, and maintaining data consistency across platforms.
+
+By adopting these approaches, the PlanIt app will provide a comprehensive and efficient system for event management, notifications, and calendar syncing, ensuring a smooth experience for users on both Android and iOS devices.
